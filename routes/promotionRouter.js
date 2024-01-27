@@ -15,7 +15,8 @@ promotionsRouter
       })
       .catch((err) => next(err));
   })
-  .post(authenticate.verifyUser, (req, res, next) => {
+  .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+    // Only Admin can modify
     Promotion.create(req.body)
       .then((Promotion) => {
         console.log("Promotion Created ", Promotion);
@@ -29,15 +30,19 @@ promotionsRouter
     res.statusCode = 403;
     res.end("PUT operation not supported on /Promotion");
   })
-  .delete(authenticate.verifyUser, (req, res, next) => {
-    Promotion.deleteMany()
-      .then((response) => {
-        res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
-        res.json(response);
-      })
-      .catch((err) => next(err));
-  });
+  .delete(
+    authenticate.verifyUser,
+    authenticate.verifyAdmin, // Only Admin can modify
+    (req, res, next) => {
+      Promotion.deleteMany()
+        .then((response) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(response);
+        })
+        .catch((err) => next(err));
+    }
+  );
 
 //=========================================================================================
 
@@ -58,7 +63,8 @@ promotionsRouter
       `POST operation not supported on /Promotions/${req.params.PromotionId}`
     );
   })
-  .put(authenticate.verifyUser, (req, res, next) => {
+  .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+    // Only Admin can modify
     Promotion.findByIdAndUpdate(
       req.params.PromotionId,
       {
@@ -73,14 +79,18 @@ promotionsRouter
       })
       .catch((err) => next(err));
   })
-  .delete(authenticate.verifyUser, (req, res, next) => {
-    Promotion.findByIdAndDelete(req.params.PromotionId)
-      .then((response) => {
-        res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
-        res.json(response);
-      })
-      .catch((err) => next(err));
-  });
+  .delete(
+    authenticate.verifyUser,
+    authenticate.verifyAdmin, // Only Admin can modify
+    (req, res, next) => {
+      Promotion.findByIdAndDelete(req.params.PromotionId)
+        .then((response) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(response);
+        })
+        .catch((err) => next(err));
+    }
+  );
 
 module.exports = promotionsRouter;
